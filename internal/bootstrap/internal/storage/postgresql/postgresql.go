@@ -29,20 +29,5 @@ func New(config *config.Storage) (*Storage, error) {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	//stmt, err := db.Prepare(`
-	//CREATE TABLE IF NOT EXISTS urls (
-	//   id INTEGER PRIMARY KEY AUTO_INCREMENT,
-	//	alias TEXT UNIQUE NOT NULL,
-	//	url TEXT UNIQUE NOT NULL);
-	//Create INDEX IF NOT EXISTS idx_alias ON urls (alias);
-	//`)
-	//if err != nil {
-	//	return nil, fmt.Errorf("%s: %w", op, err)
-	//}
-	//_, err = stmt.Exec()
-	//if err != nil {
-	//	return nil, fmt.Errorf("%s: %w", op, err)
-	//}
-
 	return &Storage{Db: db}, nil
 }

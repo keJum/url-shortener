@@ -22,7 +22,10 @@
 go.work
 
 # GoLand
-.idea
+/.idea
 
 # Custom
 .env
+/config/local.yaml
+/bin
+/vendor

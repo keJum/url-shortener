@@ -1,10 +1,10 @@
 package main
 
 import (
-	"url-shortener/internal/bootstrap"
+	"url-shortener/internal/app/bootstrap"
 )
 
 func main() {
-	app := bootstrap.App()
+	app := bootstrap.Factory()
 	_ = app
 }

@@ -1,4 +1,4 @@
-package libLoggerSlog
+package slog
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ func MustSetupLogger(app string) *slog.Logger {
 	case envProd:
 		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
 	default:
-		fmt.Printf("unknown app: %#v\n ", app)
+		fmt.Printf("unknown bootstrap: %#v\n ", app)
 		os.Exit(1)
 	}
 	return log

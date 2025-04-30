@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 	"strconv"
 	"url-shortener/internal/config"
+	storageErr "url-shortener/internal/lib/storage/errors"
 	"url-shortener/internal/storage"
 )
 
@@ -35,5 +36,19 @@ func FactoryStorage(config config.Storage) (storage.Storage, error) {
 }
 
 func (s Storage) SaveUrl(url, alice string) error {
-	return errors.New(url + alice)
+	const op = "storage.postgres.SaveUrl"
+
+	stmt, err := s.Db.Prepare("INSERT INTO urls(\"url\", \"alias\") VALUES ($1, $2)")
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	_, err = stmt.Exec(url, alice)
+	if err != nil {
+		var postgresErr *pq.Error
+		if errors.As(err, &postgresErr) && postgresErr.Code.Name() == "unique_violation" {
+			return fmt.Errorf("%s: %w", op, storageErr.ErrUrlExists)
+		}
+	}
+	return err
 }

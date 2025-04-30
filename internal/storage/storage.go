@@ -1,9 +1,9 @@
 package storage
 
 type Storage interface {
-	SaveUrl
+	Writer
 }
 
-type SaveUrl interface {
+type Writer interface {
 	SaveUrl(url, alice string) error
 }

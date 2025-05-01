@@ -65,10 +65,6 @@ func (s Storage) GetUrl(alice string) (string, error) {
 
 	err = stmt.QueryRow(alice).Scan(&url)
 	if err != nil {
-		var postgresErr *pq.Error
-		if errors.As(err, &postgresErr) && postgresErr.Code.Name() == "not_found" {
-			return "", fmt.Errorf("%s: %w", op, storageErr.ErrUrlNotFound)
-		}
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", fmt.Errorf("%s: %w", op, storageErr.ErrUrlNotFound)
 		} else {

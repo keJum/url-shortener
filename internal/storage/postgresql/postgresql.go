@@ -67,9 +67,8 @@ func (s Storage) GetUrl(alice string) (string, error) {
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", fmt.Errorf("%s: %w", op, storageErr.ErrUrlNotFound)
-		} else {
-			return "", fmt.Errorf("%s: %w", op, err)
 		}
+		return "", fmt.Errorf("%s: %w", op, err)
 	}
 	return url, nil
 }

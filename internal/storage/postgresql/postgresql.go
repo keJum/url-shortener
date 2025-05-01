@@ -45,10 +45,35 @@ func (s Storage) SaveUrl(url, alice string) error {
 
 	_, err = stmt.Exec(url, alice)
 	if err != nil {
+
 		var postgresErr *pq.Error
 		if errors.As(err, &postgresErr) && postgresErr.Code.Name() == "unique_violation" {
 			return fmt.Errorf("%s: %w", op, storageErr.ErrUrlExists)
 		}
 	}
 	return err
+}
+
+func (s Storage) GetUrl(alice string) (string, error) {
+	const op = "storage.postgres.GetUrl"
+	var url string
+
+	stmt, err := s.Db.Prepare("SELECT url FROM urls WHERE alias = $1")
+	if err != nil {
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	err = stmt.QueryRow(alice).Scan(&url)
+	if err != nil {
+		var postgresErr *pq.Error
+		if errors.As(err, &postgresErr) && postgresErr.Code.Name() == "not_found" {
+			return "", fmt.Errorf("%s: %w", op, storageErr.ErrUrlNotFound)
+		}
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", fmt.Errorf("%s: %w", op, storageErr.ErrUrlNotFound)
+		} else {
+			return "", fmt.Errorf("%s: %w", op, err)
+		}
+	}
+	return url, nil
 }

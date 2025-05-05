@@ -6,24 +6,23 @@ import (
 	"fmt"
 	"github.com/lib/pq"
 	"strconv"
-	"url-shortener/internal/config"
+	"url-shortener/internal/config/cleanenv"
 	storageErr "url-shortener/internal/lib/storage/errors"
-	"url-shortener/internal/storage"
 )
 
 type Storage struct {
 	Db *sql.DB
 }
 
-func FactoryStorage(config config.Storage) (storage.Storage, error) {
+func FactoryStorage(config *cleanenv.Config) (*Storage, error) {
 	const op = "storage.postgres.New"
 
-	port, err := strconv.Atoi(config.GetPort())
+	port, err := strconv.Atoi(config.Port)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 	connectionString := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable", config.GetHost(), port, config.GetUser(), config.GetPassword(), config.GetDBName())
+		"password=%s dbname=%s sslmode=disable", config.Host, port, config.User, config.Password, config.DbName)
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
@@ -45,7 +44,6 @@ func (s Storage) SaveUrl(url, alice string) error {
 
 	_, err = stmt.Exec(url, alice)
 	if err != nil {
-
 		var postgresErr *pq.Error
 		if errors.As(err, &postgresErr) && postgresErr.Code.Name() == "unique_violation" {
 			return fmt.Errorf("%s: %w", op, storageErr.ErrUrlExists)

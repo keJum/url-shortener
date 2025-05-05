@@ -6,7 +6,6 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"time"
-	configInterface "url-shortener/internal/config"
 )
 
 type Config struct {
@@ -22,14 +21,14 @@ type HttpServer struct {
 }
 
 type Storage struct {
-	Host   string `env:"STORAGE_HOST" env-bootstrap:"localhost" env-required:"true"`
-	Port   string `env:"STORAGE_PORT" env-bootstrap:"8080" env-required:"true"`
-	User   string `env:"STORAGE_USER" env-bootstrap:"development" env-required:"true"`
-	Pass   string `env:"STORAGE_PASS" env-bootstrap:"development" env-required:"true"`
-	DbName string `env:"STORAGE_DB_NAME" env-bootstrap:"urlShortener" env-required:"true"`
+	Host     string `env:"STORAGE_HOST" env-bootstrap:"localhost" env-required:"true"`
+	Port     string `env:"STORAGE_PORT" env-bootstrap:"8080" env-required:"true"`
+	User     string `env:"STORAGE_USER" env-bootstrap:"development" env-required:"true"`
+	Password string `env:"STORAGE_PASS" env-bootstrap:"development" env-required:"true"`
+	DbName   string `env:"STORAGE_DB_NAME" env-bootstrap:"urlShortener" env-required:"true"`
 }
 
-func Factory() configInterface.Config {
+func Factory() *Config {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal(err.Error())
 	}
@@ -42,47 +41,4 @@ func Factory() configInterface.Config {
 	fmt.Printf("config: %#v\n", config)
 
 	return &config
-}
-
-func (c *Config) GetApp() string {
-	return c.App
-}
-
-func (c *Config) GetHTTPServer() configInterface.HTTPServer {
-	return &c.HttpServer
-}
-
-func (h *HttpServer) GetAddress() string {
-	return h.Address
-}
-
-func (h *HttpServer) GetTimeout() time.Duration {
-	return h.Timeout
-}
-
-func (h *HttpServer) GetIdleTimeout() time.Duration {
-	return h.IdleTimeout
-}
-
-func (c *Config) GetStorage() configInterface.Storage {
-	return &c.Storage
-}
-
-func (s *Storage) GetHost() string {
-	return s.Host
-}
-
-func (s *Storage) GetPort() string {
-	return s.Port
-}
-
-func (s *Storage) GetUser() string {
-	return s.User
-}
-func (s *Storage) GetPassword() string {
-	return s.Pass
-}
-
-func (s *Storage) GetDBName() string {
-	return s.DbName
 }

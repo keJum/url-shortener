@@ -7,4 +7,6 @@ import (
 func main() {
 	app := bootstrap.Factory()
 	_ = app
+	//logger := app.GetLogger()
+	//logger.Info(app.GetStorage().GetUrl("google1"))
 }

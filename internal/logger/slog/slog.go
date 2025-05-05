@@ -14,6 +14,7 @@ const (
 
 func MustSetupLogger(app string) *slog.Logger {
 	var log *slog.Logger
+	fmt.Println(fmt.Sprintf("setup logger for %s", app))
 	switch app {
 	case envLocal:
 		log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))

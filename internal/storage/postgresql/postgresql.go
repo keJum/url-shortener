@@ -70,3 +70,22 @@ func (s Storage) GetUrl(alice string) (string, error) {
 	}
 	return url, nil
 }
+
+func (s Storage) DeleteUrl(alice string) error {
+	const op = "storage.postgres.DeleteUrl"
+
+	stmt, err := s.Db.Prepare("DELETE FROM urls WHERE alias = $i")
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	_, err = stmt.Exec(alice)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("%s: %w", op, storageErr.ErrUrlNotFound)
+		}
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}

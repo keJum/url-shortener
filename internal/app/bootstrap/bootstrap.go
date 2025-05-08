@@ -9,28 +9,29 @@ import (
 	"url-shortener/internal/storage/postgresql"
 )
 
-type Logger interface {
-	Info(msg string, args ...any)
-}
+//type Logger interface {
+//	Info(msg string, args ...any)
+//	Error(msg string, args ...any)
+//}
 
 type Storage interface {
-	StorageWriter
-	StorageReader
+	//StorageWriter
+	//StorageReader
 }
 
-type StorageWriter interface {
-	SaveUrl(url, alice string) error
-	DeleteUrl(url string) error
-}
-
-type StorageReader interface {
-	GetUrl(alice string) (string, error)
-}
+//type StorageWriter interface {
+//	SaveUrl(url, alice string) error
+//	DeleteUrl(url string) error
+//}
+//
+//type StorageReader interface {
+//	GetUrl(alice string) (string, error)
+//}
 
 type App struct {
 	cfg     *cleanenv.Config
-	log     Logger
-	storage Storage
+	log     *slog.Logger
+	storage *postgresql.Storage
 }
 
 func Factory() *App {
@@ -44,20 +45,20 @@ func Factory() *App {
 	log.Info("starting server url-shortener")
 	log.Debug("debug on")
 
-	storagePostgres, err := postgresql.FactoryStorage(cfg)
+	storage, err := postgresql.FactoryStorage(cfg)
 	if err != nil {
 		log.Error("failed to connect to storage", err.Error())
 		os.Exit(1)
 	}
 	log.Info("connected to db success")
 
-	return &App{cfg: cfg, log: log, storage: storagePostgres}
+	return &App{cfg: cfg, log: log, storage: storage}
 }
 
 func (app *App) GetStorage() Storage {
 	return app.storage
 }
 
-func (app *App) GetLogger() Logger {
+func (app *App) GetLogger() *slog.Logger {
 	return app.log
 }

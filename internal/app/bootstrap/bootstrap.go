@@ -1,37 +1,21 @@
 package bootstrap
 
 import (
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"log/slog"
 	"os"
 	"strconv"
 	"url-shortener/internal/config/cleanenv"
+	middlewareLogger "url-shortener/internal/http-server/middleware/logger"
 	libLoggerSlog "url-shortener/internal/logger/slog"
 	"url-shortener/internal/storage/postgresql"
 )
 
-//type Logger interface {
-//	Info(msg string, args ...any)
-//	Error(msg string, args ...any)
-//}
-
-type Storage interface {
-	//StorageWriter
-	//StorageReader
-}
-
-//type StorageWriter interface {
-//	SaveUrl(url, alice string) error
-//	DeleteUrl(url string) error
-//}
-//
-//type StorageReader interface {
-//	GetUrl(alice string) (string, error)
-//}
-
 type App struct {
-	cfg     *cleanenv.Config
-	log     *slog.Logger
-	storage *postgresql.Storage
+	Cfg     *cleanenv.Config
+	Log     *slog.Logger
+	Storage *postgresql.Storage
 }
 
 func Factory() *App {
@@ -52,13 +36,11 @@ func Factory() *App {
 	}
 	log.Info("connected to db success")
 
-	return &App{cfg: cfg, log: log, storage: storage}
-}
+	router := chi.NewRouter()
+	router.Use(middleware.RequestID)
+	router.Use(middlewareLogger.New(log))
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.URLFormat)
 
-func (app *App) GetStorage() Storage {
-	return app.storage
-}
-
-func (app *App) GetLogger() *slog.Logger {
-	return app.log
+	return &App{Cfg: cfg, Log: log, Storage: storage}
 }
